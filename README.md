@@ -27,7 +27,7 @@ pip install -e .
 After installing, run:
 
 ```bash
-processing
+post_process_jfsd
 ```
 
 This executes the main processing workflow.
