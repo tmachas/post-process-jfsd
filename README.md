@@ -1,6 +1,6 @@
 # post_process_jfsd
 
-This package contains various post processing routines, tailored for the Jax Fast Stokesian Dynamics implementation of the stokesian dynamics colloidal simulation method
+This package contains various post processing routines, tailored for the Jax Fast Stokesian Dynamics implementation of the stokesian dynamics colloidal simulation method (https://github.com/torrewk/Python-Jax-Fast-Stokesian-Dynamics)
 
 Currently includes:
 - Mean square displacement
@@ -14,12 +14,6 @@ Currently includes:
 ```bash
 cd post_process_jfsd
 pip install .
-```
-
-Or, for development mode:
-
-```bash
-pip install -e .
 ```
 
 ## Usage
@@ -47,6 +41,6 @@ This executes the main processing workflow.
 Pull requests are welcome! For major changes, please open an issue first.
 
 ## Contact
-Athanasios Machas
+Athanasios Machas, 
 University of Crete and Foundation for Research and Technology Hellas, Greece
 amachas@materials.uoc.gr
