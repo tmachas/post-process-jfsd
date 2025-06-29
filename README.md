@@ -6,6 +6,7 @@ Currently includes:
 - Mean square displacement
 - Stress tensor calculation from the hydrodynamic stresslet (with correction of the interparticle <xF> term)
 - Calculation of the Linear Viscoelastic spectrum from the Mean square displacement using the Generalized Einstein equation
+- Calculation of the radial distribution function g(r)
 - Calculation of the xy projection of the g(r)
 - Creation of an ovito/vmd compatible .xyz file for the particle trajectories
 
@@ -23,8 +24,10 @@ After installing, run:
 ```bash
 post_process_jfsd
 ```
+in the directory containing the input.toml file and the simulation outputs (trajectory.npy, stresslet.npy).
 
-This executes the main processing workflow.
+To specify the parameters of the post processing, as well as which post processing routines will be executed, paste the post_process_settings.toml file in the simulation output directory and modify it accordingly.
+Else, only the MSD and average stress is calculated by default.
 
 ## Requirements
 
@@ -36,9 +39,6 @@ This executes the main processing workflow.
 - toml
 - cmcrameri
 
-## Contributing
-
-Pull requests are welcome! For major changes, please open an issue first.
 
 ## Contact
 Athanasios Machas, 
