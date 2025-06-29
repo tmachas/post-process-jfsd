@@ -13,7 +13,7 @@ Currently includes:
 ## Installation
 
 ```bash
-cd post_process_jfsd
+cd post-process-jfsd
 pip install .
 ```
 
