@@ -1,0 +1,33 @@
+[basic]
+just_basic_calculation = false # Just the msd and binned averaged stress calculation. If true nothing else is read
+
+
+[MSD]
+MSD_calculation = false
+
+[Stresses]
+Binned_stress_average_calculation = false
+N_stress_bins = 80 # The number of the bins for the stress average
+Raw_stress_output = true # Output of the only-particle-averaged stress
+particle_stress_correction = false # Output a file with the <xF> term
+
+[gofxy]
+gofxy_calculation = false
+frame = 10 # Frame for which the gofxy is calculated
+subtract_rest = true # Subtract the zeroth frame gofxy (assuming that it is at rest)
+slice_width = 0.7
+N_gofxy_bins = 200
+Xmax = 4.0
+Ymax = 4.0
+
+[gofr]
+gofr_calculation = true
+frame = -1
+N_gofr_bins = 80
+r_max = 5.0
+
+[ovito_file]
+xyz_file = false # Creating an ovito-compatible .xyz file for the trajectory
+
+[MSD_to_LVE]
+lve_calculation = false
