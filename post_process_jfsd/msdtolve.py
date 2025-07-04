@@ -1,8 +1,3 @@
-"""
-Script to calculate the LVE spectrum from the MSD
-Thanasis Machas (rewrite in python; the original script I took from T. Athanasiou)
-27/5/25 (added input handling functions and automatic msd calculation)
-"""
 import numpy as np
 from scipy.special import gamma
 
@@ -25,17 +20,17 @@ def msd_to_lve(fileout: str):
 
     # Load data (text format)
     try:
-        data = np.loadtxt("FreudMSD"+fileout+".dat", skiprows=1)
+        data = np.loadtxt("MSD"+fileout+".dat", skiprows=1)
     except FileNotFoundError:
         print("MSD file not found. Calculating now...")
 
-        trajectory, _, _ = load_and_check(False)
+        trajectory, _, _, _ = load_and_check(False)
         input_params = simulation_parameters(trajectory)
         calculate_msd(trajectory, input_params, fileout)
 
         print("MSD calculated!")
         try:
-            data = np.loadtxt("FreudMSD"+fileout+".dat", skiprows=1)
+            data = np.loadtxt("MSD"+fileout+".dat", skiprows=1)
         except FileNotFoundError:
             print("MSD file still not found. Something else is wrong. Abort!")
             exit()
