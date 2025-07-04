@@ -22,9 +22,13 @@ Ymax = 4.0
 
 [gofr]
 gofr_calculation = true
-frame = -1
 N_gofr_bins = 80
 r_max = 5.0
+
+[velocity_profile]
+v_profile_calculation = true
+frame = -1
+N_bins = 80
 
 [ovito_file]
 xyz_file = false # Creating an ovito-compatible .xyz file for the trajectory

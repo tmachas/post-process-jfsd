@@ -1,8 +1,3 @@
-"""
-Script to make the g(r) projections on the xy plane
-Thanasis Machas 
-27/6/25 (added the input handling functions)
-"""
 import numpy as np
 from numpy import ndarray as Array
 from matplotlib import pyplot as plt

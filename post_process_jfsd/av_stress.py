@@ -1,36 +1,24 @@
 import numpy as np
 from numpy import ndarray as Array
-from scipy.stats import binned_statistic
 
-def log_bin_stat(time: np.ndarray[float], data: Array, num_bins=80):
-    """
-    A function to perform the logarithmic binning average over some data
-
-    Parameters
-    ----------
-    time: (ArrayLike[float])
-        Array with the time steps
-    data: (ArrayLike[float])
-        Array with the data to be averaged (has to be same size as time)
-    num_bins: (int)
-        The number of bins
-
-    Returns
-    ----------
-    bin_centers: (ArrayLike[float])
-        Array with the binned times
-    bin_means: (ArrayLike[float])
-        Array with the averaged values
-    """
-    bins = np.logspace(np.log10(time[1]), np.log10(time[-1]), num_bins)
-    bin_means, _, _ = binned_statistic(time, data, statistic='mean', bins=bins)
-    bin_centers = np.sqrt(bins[:-1] * bins[1:])  # geometric mean for center
-    
-    return bin_centers, bin_means
+from post_process_jfsd.utils import log_bin_stat
 
 
 def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str):
-    
+    """
+    Function to calculate the <xF> term of the stress tensor and output it seperately
+
+    Parameters
+    ------------
+    trajectory: (Array)
+        The positions of the particles for every frame
+    input_params: (tuple)
+        The simulation input parameters
+    raw_stress_flag: (bool)
+        Flag whether the only-over-particle-averaged stress is outputed
+    fileout: (str)
+        The name of the parent directory
+    """
     # Untuple parameters
     (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
 
@@ -138,7 +126,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
 
         raw_stresslet = av_stresslet * N / (box_length**3) / kT # Translate the stresslet to the stress tensor and normalize
 
-        file4 = open("FreudAVST"+fileout+"raw.dat","w+")
+        file4 = open("AVST"+fileout+"raw.dat","w+")
         file4.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
         for i in range(n_steps):
             file4.write(str(time[i]/tb)+"   "+str(time[i]/tb*Pe)+"   "+str(raw_stresslet[i][1])+"   "+str(raw_stresslet[i][0])+"   "+str(raw_stresslet[i][2])+"   "+str(0.0 - raw_stresslet[i][0] - raw_stresslet[i][2])+"\n")
@@ -164,8 +152,10 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
 
     
     # Save the averaged stresslet
-    file3 = open("FreudAVST"+fileout+".dat","w+") #storing the stress tensor
+    file3 = open("AVST"+fileout+".dat","w+") #storing the stress tensor
     file3.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
     for i in range(len(binned_times)):
         file3.write(str(binned_times[i]/tb)+"   "+str(binned_times[i]/tb*Pe)+"   "+str(binned_stresslet_xy[i])+"   "+str(binned_stresslet_xx[i])+"   "+str(binned_stresslet_yy[i])+"   "+str(binned_stresslet_zz[i])+"\n")
     file3.close
+
+    return

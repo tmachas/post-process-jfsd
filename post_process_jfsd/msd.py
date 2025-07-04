@@ -47,7 +47,7 @@ def calculate_msd(trajectory: np.ndarray[float], input_params: tuple, fileout: s
     # Retrieve the mean squared displacement results
     msd = msd_calculator.msd
 
-    file=open("FreudMSD"+fileout+".dat","w+") #storing the unwrappped MSD
+    file=open("MSD"+fileout+".dat","w+") #storing the unwrappped MSD
     file.write("t/t\-(B)    MSD\n")
     for i in range(n_steps-1):
         file.write(str(time[i+1]/tb)+"   "+str(msd[i+1])+"\n")

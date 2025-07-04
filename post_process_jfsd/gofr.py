@@ -43,9 +43,11 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
     gofr = gofr_calculator.rdf
 
     # Write the output in a file
-    file = open("Freudgofr"+fileout+".dat","w+")
+    file = open("gofr"+fileout+".dat","w+")
     file.write("r/R   g(r)\n")
     for i in range(len(r_values)):
         file.write(str(r_values[i])+"   "+str(gofr[i])+"\n")
     file.close
+
+    return
     

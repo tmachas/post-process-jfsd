@@ -1,5 +1,4 @@
 import toml
-import os
 
 from post_process_jfsd.utils import dir_name, simulation_parameters, load_and_check
 from post_process_jfsd.msd import calculate_msd
@@ -7,6 +6,7 @@ from post_process_jfsd.av_stress import caclulate_average_stress, calculate_part
 from post_process_jfsd.npy_to_xyz import npy_to_xyz
 from post_process_jfsd.gofr_2d import gofxy_image
 from post_process_jfsd.gofr import gofr
+from post_process_jfsd.velocity_profile import vel_profile
 from post_process_jfsd.msdtolve import msd_to_lve
 
 
@@ -39,6 +39,8 @@ def main():
         gofxy_flag = False
 
         gofr_flag = False
+
+        v_profile_flag = False
         
         ovito_flag = False
 
@@ -64,12 +66,15 @@ def main():
         N_gofr_bins = int(settings_file['gofr']['N_gofr_bins'])
         gofr_r_max = float(settings_file['gofr']['r_max'])
 
+        v_profile_flag = bool(settings_file['velocity_profile']['v_profile_calculation'])
+        v_profile_bins = int(settings_file['velocity_profile']['N_bins'])
+
         ovito_flag = bool(settings_file['ovito_file']['xyz_file'])
 
         lve_flag = bool(settings_file['MSD_to_LVE']['lve_calculation'])
 
     # Load the input files
-    (trajectory, stresslet, last_frame_index) = load_and_check(av_stress_flag)
+    (trajectory, stresslet, velocities, last_frame_index) = load_and_check(av_stress_flag, v_profile_flag)
 
     # Load the simulation parameters
     input_params = simulation_parameters(trajectory)
@@ -94,6 +99,8 @@ def main():
     if gofxy_flag:
         print(f"Frame = {gofxy_frame}")
         print(f"Subtract zeroth frame: {gofxy_subtract_rest_flag}")
+    print("")
+    print(f"Velocity profile calculation: {v_profile_flag}")
     print("")
     print(f"Ovito file output: {ovito_flag}")
     print("")
@@ -122,6 +129,10 @@ def main():
     if gofxy_flag:
         print("Calculating g(r) on xy plane...")
         gofxy_image(trajectory, input_params, last_frame_index, gofxy_frame, gofxy_subtract_rest_flag, fileout, gofxy_slice_width, N_gofxy_bins, Xmax, Ymax)
+
+    if v_profile_flag:
+        print("Calculating velocity profile...")
+        vel_profile(trajectory, velocities, input_params, v_profile_bins, fileout)
 
     if ovito_flag:
         print("Writing ovito file...")
