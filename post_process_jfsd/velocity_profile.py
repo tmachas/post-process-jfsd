@@ -3,7 +3,7 @@ import numpy as np
 
 from post_process_jfsd.utils import lin_bin_stat
 
-def vel_profile(trajectory: Array, velocities: Array, input_params: tuple, n_bins: int, fileout: str):
+def vel_profile(trajectory: Array, velocities: Array, input_params: tuple, n_bins: int, fileout: str) -> tuple[Array, Array]:
     """
     Function to calculate the velocity profile of the sheared system, averaged over all of the frames
 
@@ -19,6 +19,13 @@ def vel_profile(trajectory: Array, velocities: Array, input_params: tuple, n_bin
         The number of the bins for the velocities averaging
     fileout: (str)
         The name of the parent directory
+
+    Returns
+    ------------
+    binned_y: (Array)
+        The y binned coordinate values
+    binned_velocities: (Array)
+        The averaged velocity values
     """
     # Define the positions and velocities for this frame
     positions = trajectory[:,:,1] # the y positions 
@@ -47,4 +54,4 @@ def vel_profile(trajectory: Array, velocities: Array, input_params: tuple, n_bin
         file.write(str(binned_y[i])+"   "+str(binned_velocities[i])+"   "+str(binned_y[i]*shear_rate/period)+"\n")
     file.close
 
-    return
+    return binned_y, binned_velocities

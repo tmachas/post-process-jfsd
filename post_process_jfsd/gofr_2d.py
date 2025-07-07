@@ -10,7 +10,7 @@ def gofxy_for_frame(trajectory: Array,
                     Xmax: float, Ymax: float, 
                     N: int, 
                     slice_width: float, 
-                    frame: int):
+                    frame: int) -> Array:
     """
     Function to calculate the gofxy for a specific frame
 
@@ -55,7 +55,7 @@ def gofxy_image(
     slice_width: float,
     N_gofxy_bins: int,
     Xmax: float,
-    Ymax: float)  -> None :
+    Ymax: float)  -> Array :
 
     """
     Create the image of the xy projection of the g(r) for a specific time frame. There is the option to subtract from it the g(r) at rest (of the first frame)
@@ -82,6 +82,11 @@ def gofxy_image(
         The maximum x value of the image (total image ranges [-Xmax, Xmax])
     Ymax: (float)
         The maximum y value of the image (total image ranges [-Ymax, Ymax])
+
+    Returns
+    -----------
+    gofxy_to_be_plotted: (Array)
+        The gofxy values for the given frame; has dimensions (n_bins, n_bins)
     """
     # Testing if input frame is out of range
     if frame > last_frame_index:
@@ -105,10 +110,12 @@ def gofxy_image(
     X, Y = np.meshgrid(xedges, yedges)
 
     if subtract_rest==True:
-        plt.pcolormesh(X, Y, gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame) - gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame = 0), cmap=cmc.berlin)
+        gofxy_to_be_plotted = gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame) - gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame = 0)
+        plt.pcolormesh(X, Y, gofxy_to_be_plotted, cmap=cmc.berlin)
         title_add = "_zeroth_frame_subtracted"
     else:
-        plt.pcolormesh(X, Y, gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame))
+        gofxy_to_be_plotted = gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame)
+        plt.pcolormesh(X, Y, gofxy_to_be_plotted)
         title_add = ""
     plt.colorbar()
     plt.title(fileout+f" Frame = {frame} " + title_add)
@@ -116,4 +123,4 @@ def gofxy_image(
     # Save the image
     plt.savefig("gofxy"+fileout+"frame"+str(frame)+title_add+".png")
 
-    return
+    return gofxy_to_be_plotted

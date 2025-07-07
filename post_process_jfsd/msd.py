@@ -1,19 +1,27 @@
 import numpy as np
+from numpy import ndarray as Array
 import freud
 
 
-def calculate_msd(trajectory: np.ndarray[float], input_params: tuple, fileout: str):
+def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple[Array, Array]:
     """
     Function to calculate the msd from the unwrapped trajectory
     
     Parameters
     -----------
-    trajectory: (ndarray)
+    trajectory: (Array)
         The input trajectory
     input_params: (tuple)
         The input parameters
     fileout: (str)
-        The name of the parent directory (for naming the output files) 
+        The name of the parent directory (for naming the output files)
+
+    Returns
+    -----------
+    time/tb: (Array)
+        The time intervals normalized by the brownian time
+    msd: (Array)
+        The calculated msds 
 
     """
     (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
@@ -53,4 +61,4 @@ def calculate_msd(trajectory: np.ndarray[float], input_params: tuple, fileout: s
         file.write(str(time[i+1]/tb)+"   "+str(msd[i+1])+"\n")
     file.close
 
-    return
+    return time/tb, msd
