@@ -2,7 +2,7 @@ import numpy as np
 from numpy import ndarray as Array
 import freud
 
-def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float, fileout: str):
+def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float, fileout: str) -> tuple[Array, Array]:
     """
     A function to calculate the radial distribution function for a given trajectory
 
@@ -23,6 +23,14 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
         Maximum r for g(r) calculation
     fileout: (str)
         The name of the parent directory
+
+    Returns
+    ------------
+
+    r_values: (Array)
+        The radial distance values
+    gofr: (Array)
+        The calculated radial pdf
     """
 
     # Testing if input frame is out of range
@@ -49,5 +57,5 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
         file.write(str(r_values[i])+"   "+str(gofr[i])+"\n")
     file.close
 
-    return
+    return r_values, gofr
     

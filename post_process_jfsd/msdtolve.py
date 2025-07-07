@@ -1,11 +1,12 @@
 import numpy as np
+from numpy import ndarray as Array
 from scipy.special import gamma
 
 from post_process_jfsd.utils import simulation_parameters, load_and_check
 from post_process_jfsd.msd import calculate_msd
 
 
-def msd_to_lve(fileout: str):
+def msd_to_lve(fileout: str) -> tuple[Array, Array, Array] :
     """
     Function to calculate the Linear Viscoelastic spectrum from the MSD. If the MSD file is not found, it is calculated, provided the trajectory exists.
 
@@ -13,6 +14,15 @@ def msd_to_lve(fileout: str):
     -----------
     fileout: (str)
         The name of the parent directory
+
+    Returns
+    -----------
+    omega: (Array)
+        The values of the angular frequency (normalized by tb)
+    Gp: (Array)
+        The normalized storage modulus values
+    Gdp: (Array)
+        The normalized loss modulus values
     """
     # Constants
     pi = np.pi
@@ -78,4 +88,4 @@ def msd_to_lve(fileout: str):
         file.write(str(omega[i])+"   "+str(Gp[i])+"   "+str(Gdp[i])+"\n")
     file.close
 
-    return
+    return omega, Gp, Gdp

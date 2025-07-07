@@ -4,7 +4,7 @@ from numpy import ndarray as Array
 from post_process_jfsd.utils import log_bin_stat
 
 
-def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str):
+def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str) -> tuple[Array, Array]:
     """
     Function to calculate the <xF> term of the stress tensor and output it seperately
 
@@ -18,6 +18,13 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
         Flag whether the only-over-particle-averaged stress is outputed
     fileout: (str)
         The name of the parent directory
+
+    Returns
+    -------------
+    binned_times*shear_rate: (Array)
+        The binned strain values
+    binned_stress_xy: (Array)
+        The dimensionless xy component of the particle stress tensor
     """
     # Untuple parameters
     (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
@@ -82,11 +89,11 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
             file.write(str(time[i]*shear_rate)+"   "+str(np.transpose(stress_tensor)[1][i])+"\n")
         file.close
 
-    return
+    return time*shear_rate, binned_stress_xy
 
 
 
-def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_flag: bool, N_stress_bins: int, fileout: str):
+def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_flag: bool, N_stress_bins: int, fileout: str) -> tuple[Array, Array]:
     """
     A function to calculate the logarithmic binned average of the stresslet. There is also option to save the only-particle-averaged stresslet
 
@@ -103,6 +110,13 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
         The number of bins for the stress average
     fileout: (str)
         The name of the parent directory, for naming the output file
+
+    Returns
+    -------------
+    binned_times/tb*Pe: (Array)
+        The strain values 
+    binned_stress_xy: (Array)
+        The dimensionless average xy component of the stresslet
 
     Notes
     ----------
@@ -158,4 +172,4 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
         file3.write(str(binned_times[i]/tb)+"   "+str(binned_times[i]/tb*Pe)+"   "+str(binned_stresslet_xy[i])+"   "+str(binned_stresslet_xx[i])+"   "+str(binned_stresslet_yy[i])+"   "+str(binned_stresslet_zz[i])+"\n")
     file3.close
 
-    return
+    return binned_times/tb*Pe, binned_stresslet_xy
