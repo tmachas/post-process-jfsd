@@ -39,7 +39,7 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     positions = trajectory[frame]
     
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     # Initialize the calculator, set the r_values and make the freud box
     gofr_calculator = freud.density.RDF(bins = N_gofr_bins, r_max = r_max)

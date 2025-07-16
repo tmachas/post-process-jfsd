@@ -92,7 +92,7 @@ def gofxy_image(
     if frame > last_frame_index:
         raise ValueError(f"Selected frame is out of range. Last frame has index {last_frame_index}. Exiting...")
 
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     # Testing if Xmax and Ymax are bigger than box size
     if (Xmax > box_length / 2.) or (Ymax > box_length / 2.) :

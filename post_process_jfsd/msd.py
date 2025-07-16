@@ -3,7 +3,7 @@ from numpy import ndarray as Array
 import freud
 
 
-def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple[Array, Array]:
+def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: bool, fileout: str) -> tuple[Array, Array]:
     """
     Function to calculate the msd from the unwrapped trajectory
     
@@ -13,6 +13,8 @@ def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple
         The input trajectory
     input_params: (tuple)
         The input parameters
+    windowed_msd_flag: (bool)
+        Flag whether the windowed or direct msd is calculated
     fileout: (str)
         The name of the parent directory (for naming the output files)
 
@@ -24,7 +26,7 @@ def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple
         The calculated msds 
 
     """
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     # Define the box dimensions (assuming a cubic box for simplicity)
     half_box_length = box_length / 2.0
@@ -47,7 +49,14 @@ def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple
     #np.save("unwrappedtrajectory",unwrapped_trajectory)
 
     # Initialize the MSD calculator
-    msd_calculator = freud.msd.MSD()
+    if windowed_msd_flag:
+        msd_mode = 'window'
+        fileoutadd = ''
+    else:
+        msd_mode = 'direct'
+        fileoutadd = 'direct'
+
+    msd_calculator = freud.msd.MSD(mode=msd_mode)
 
     # Compute the MSD using the unwrapped trajectory
     msd_calculator.compute(unwrapped_trajectory)
@@ -55,7 +64,7 @@ def calculate_msd(trajectory: Array, input_params: tuple, fileout: str) -> tuple
     # Retrieve the mean squared displacement results
     msd = msd_calculator.msd
 
-    file=open("MSD"+fileout+".dat","w+") #storing the unwrappped MSD
+    file=open("MSD"+fileoutadd+fileout+".dat","w+") #storing the unwrappped MSD
     file.write("t/t\-(B)    MSD\n")
     for i in range(n_steps-1):
         file.write(str(time[i+1]/tb)+"   "+str(msd[i+1])+"\n")

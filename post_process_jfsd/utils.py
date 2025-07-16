@@ -99,9 +99,8 @@ def simulation_parameters(trajectory: Array) -> tuple[int, int, float, int, Arra
     shear_rate = float(input_file['physics']['shear_rate'])
     box_length = float(input_file['box']['Lx'])
     tb = 1.0 / kT
-    Pe = shear_rate*tb
 
-    return (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe)
+    return (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb)
 
 
 def log_bin_stat(time: Array, data: Array, num_bins=80) -> tuple[Array, Array]:
