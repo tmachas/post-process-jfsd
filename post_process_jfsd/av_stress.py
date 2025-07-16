@@ -27,7 +27,7 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
         The dimensionless xy component of the particle stress tensor
     """
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     # Potential characteristics
     k = 2500 / dt
@@ -130,7 +130,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     """
 
     # Get the simulation parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
     
     #Take ensemble average
     av_stresslet = np.average(stresslet, 1)
@@ -143,7 +143,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
         file4 = open("AVST"+fileout+"raw.dat","w+")
         file4.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
         for i in range(n_steps):
-            file4.write(str(time[i]/tb)+"   "+str(time[i]/tb*Pe)+"   "+str(raw_stresslet[i][1])+"   "+str(raw_stresslet[i][0])+"   "+str(raw_stresslet[i][2])+"   "+str(0.0 - raw_stresslet[i][0] - raw_stresslet[i][2])+"\n")
+            file4.write(str(time[i]/tb)+"   "+str(time[i]*shear_rate)+"   "+str(raw_stresslet[i][1])+"   "+str(raw_stresslet[i][0])+"   "+str(raw_stresslet[i][2])+"   "+str(0.0 - raw_stresslet[i][0] - raw_stresslet[i][2])+"\n")
         file4.close
 
     #Prepare the stresslets for the binning
@@ -169,7 +169,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     file3 = open("AVST"+fileout+".dat","w+") #storing the stress tensor
     file3.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
     for i in range(len(binned_times)):
-        file3.write(str(binned_times[i]/tb)+"   "+str(binned_times[i]/tb*Pe)+"   "+str(binned_stresslet_xy[i])+"   "+str(binned_stresslet_xx[i])+"   "+str(binned_stresslet_yy[i])+"   "+str(binned_stresslet_zz[i])+"\n")
+        file3.write(str(binned_times[i]/tb)+"   "+str(binned_times[i]*shear_rate)+"   "+str(binned_stresslet_xy[i])+"   "+str(binned_stresslet_xx[i])+"   "+str(binned_stresslet_yy[i])+"   "+str(binned_stresslet_zz[i])+"\n")
     file3.close
 
-    return binned_times/tb*Pe, binned_stresslet_xy
+    return binned_times*shear_rate, binned_stresslet_xy

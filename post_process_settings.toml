@@ -4,6 +4,7 @@ just_basic_calculation = false # Just the msd and binned averaged stress calcula
 
 [MSD]
 MSD_calculation = false
+windowed_msd = true
 
 [Stresses]
 Binned_stress_average_calculation = false
@@ -23,6 +24,7 @@ Ymax = 4.0
 [gofr]
 gofr_calculation = true
 N_gofr_bins = 80
+frame = -1
 r_max = 5.0
 
 [velocity_profile]

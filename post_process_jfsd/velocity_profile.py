@@ -32,7 +32,7 @@ def vel_profile(trajectory: Array, velocities: Array, input_params: tuple, n_bin
     velocities = velocities[:,:,0] # the x velocities
 
     # Get the input parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     # Prompt that there is no shear
     if shear_rate == 0.0:

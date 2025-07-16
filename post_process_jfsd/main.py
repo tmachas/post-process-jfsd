@@ -30,6 +30,7 @@ def main():
 
     if basic_process == True:
         msd_flag = True
+        msd_windowed = True
         
         av_stress_flag = True
         N_stress_bins = 80
@@ -47,6 +48,7 @@ def main():
         lve_flag = False
     else:
         msd_flag = bool(settings_file['MSD']['MSD_calculation'])
+        msd_windowed_flag = bool(settings_file['MSD']['windowed_msd'])
         
         av_stress_flag = bool(settings_file['Stresses']['Binned_stress_average_calculation'])
         N_stress_bins = int(settings_file['Stresses']['N_stress_bins'])
@@ -78,14 +80,16 @@ def main():
 
     # Load the simulation parameters
     input_params = simulation_parameters(trajectory)
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb, Pe) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
     print("Post processing parameters")
     print("-------------------------")
     print(f"MSD calculation: {msd_flag}")
+    if msd_flag:
+        print(f"Windowed msd: {msd_windowed_flag}")
     print("")
     if av_stress_flag:
-        print(f"Stress calculation: {av_stress_flag} with Pe = {Pe}")
+        print(f"Stress calculation: {av_stress_flag} with Pe = {shear_rate*tb}")
         print(f"    Raw stress: {raw_stress_flag}")
         print(f"    <xF> correction: {xF_flag}")
     else:
@@ -114,7 +118,7 @@ def main():
     # Calculate the msd
     if msd_flag:
         print("Calculating MSD...")
-        calculate_msd(trajectory, input_params, fileout)
+        calculate_msd(trajectory, input_params, msd_windowed_flag, fileout)
 
     if av_stress_flag:
         print("Calculating stresses...")
