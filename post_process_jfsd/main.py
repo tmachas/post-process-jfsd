@@ -30,7 +30,7 @@ def main():
 
     if basic_process == True:
         msd_flag = True
-        msd_windowed = True
+        msd_windowed_flag = True
         
         av_stress_flag = True
         N_stress_bins = 80

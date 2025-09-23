@@ -34,6 +34,7 @@ Else, only the MSD and average stress is calculated by default.
 
 - Python >= 3.10
 - numpy
+- jax >= 0.4.17
 - matplotlib
 - scipy
 - freud_analysis

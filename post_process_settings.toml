@@ -37,3 +37,7 @@ xyz_file = false # Creating an ovito-compatible .xyz file for the trajectory
 
 [MSD_to_LVE]
 lve_calculation = false
+
+[Structure]
+average_number_of_bonds = false
+average_voronoi_volume = false
