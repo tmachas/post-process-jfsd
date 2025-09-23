@@ -5,7 +5,7 @@ import freud
 from post_process_jfsd.utils import calculate_distances
 
 
-def bonds_number(trajectory: Array, input_params: tuple, fileout: str, attr_range = 0.1) -> tuple[Array, Array, Array]:
+def average_bonds_number(trajectory: Array, input_params: tuple, fileout: str, attr_range = 0.1) -> tuple[Array, Array, Array]:
     """
     A function to calculate the averaged over particles number of bonds, for all frames
 

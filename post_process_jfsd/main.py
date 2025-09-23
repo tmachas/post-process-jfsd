@@ -8,6 +8,7 @@ from post_process_jfsd.gofr_2d import gofxy_image
 from post_process_jfsd.gofr import gofr
 from post_process_jfsd.velocity_profile import vel_profile
 from post_process_jfsd.msdtolve import msd_to_lve
+from post_process_jfsd.bonds import average_bonds_number, average_voronoi_volume
 
 
 
@@ -46,6 +47,9 @@ def main():
         ovito_flag = False
 
         lve_flag = False
+
+        av_bonds_flag = False
+        voronoi_flag = False
     else:
         msd_flag = bool(settings_file['MSD']['MSD_calculation'])
         msd_windowed_flag = bool(settings_file['MSD']['windowed_msd'])
@@ -74,6 +78,9 @@ def main():
         ovito_flag = bool(settings_file['ovito_file']['xyz_file'])
 
         lve_flag = bool(settings_file['MSD_to_LVE']['lve_calculation'])
+
+        av_bonds_flag = bool(settings_file['Structure']['average_number_of_bonds'])
+        voronoi_flag = bool(settings_file['Structure']['average_voronoi_volume'])
 
     # Load the input files
     (trajectory, stresslet, velocities, last_frame_index) = load_and_check(av_stress_flag, v_profile_flag)
@@ -109,6 +116,12 @@ def main():
     print(f"Ovito file output: {ovito_flag}")
     print("")
     print(f"LVE spectrum calculation: {lve_flag}")
+    print("")
+    if av_bonds_flag:
+        print(f"Average bond number calculation: {av_bonds_flag}")
+    print("")
+    if voronoi_flag:
+        print(f"Average voronoi volume calculation: {voronoi_flag}")
     print("-------------------------")
 
 
@@ -145,6 +158,14 @@ def main():
     if lve_flag:
         print("Calculating LVE spectrum...")
         msd_to_lve(fileout)
+
+    if av_bonds_flag:
+        print("Caclulating average bonds...")
+        average_bonds_number(trajectory, input_params, fileout)
+
+    if voronoi_flag:
+        print("Caclulating average voronoi volume...")
+        average_voronoi_volume(trajectory, input_params, fileout)
     
     print("Done!")
 
