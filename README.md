@@ -9,6 +9,8 @@ Currently includes:
 - Calculation of the radial distribution function g(r)
 - Calculation of the xy projection of the g(r)
 - Calculation of the velocity profile
+- Calculation of average and standard deviation of number of particle bonds
+- Caclulation of average particle voronoi volume
 - Creation of an ovito/vmd compatible .xyz file for the particle trajectories
 
 ## Installation
