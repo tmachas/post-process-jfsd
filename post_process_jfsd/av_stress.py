@@ -2,11 +2,9 @@ import numpy as np
 from numpy import ndarray as Array
 from jax import jit
 import jax.numpy as jnp
-from functools import partial
 
 from post_process_jfsd.utils import log_bin_stat, calculate_distances
 
-@partial(jit, static_argnums=[1,2,3,4])
 def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str, spring_const = 2500.0) -> tuple[Array, Array]:
     """
     Function to calculate the <xF> term of the stress tensor and output it seperately
@@ -31,19 +29,21 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
     binned_stress_xy: (Array)
         The dimensionless xy component of the particle stress tensor
     """
-    # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    @jit
+    def calculate_xF_for_frame(positions: Array) -> Array:
+        """
+        Seperate routine to calculate the xF tensor for a given frame. Done so it can be jit-ed
 
-    # Potential characteristics
-    k = spring_const / dt
-    sigma = 2. * (1.001)
-
-    # Initialize stress tensor
-    stress_tensor = jnp.zeros((n_steps, 3, 3))
-
-    for step in range(n_steps):
+        Parameters
+        -------------
+        positions: (Array)
+            Positions of particles for a given frame
         
-        positions = trajectory[step]
+        Returns
+        -------------
+        S: (Array)
+            The <xF> tensor of shape (N, 3, 3)
+        """
         distance_vectors = calculate_distances(positions, N, box_length)
 
         # Compute Euclidean norms for each distance vector
@@ -69,8 +69,23 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
         # Average and normalize
         S = jnp.average(S_p, axis=0) * N / (box_length)**3 / kT
         
-        stress_tensor = stress_tensor.at[step].set(S)
+        return S
+    
+    
+    # Untuple parameters
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
 
+    # Potential characteristics
+    k = spring_const / dt
+    sigma = 2. * (1.001)
+
+    # Initialize stress tensor
+    stress_tensor = np.zeros((n_steps, 3, 3))
+
+    for step in range(n_steps):
+        
+        positions = trajectory[step]
+        stress_tensor[step] = calculate_xF_for_frame(positions)
 
     # Reshape just for my convenience
     stress_tensor_reshaped = np.reshape(stress_tensor, (n_steps, 9))
