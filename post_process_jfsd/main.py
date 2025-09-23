@@ -116,11 +116,11 @@ def main():
     print(f"Ovito file output: {ovito_flag}")
     print("")
     print(f"LVE spectrum calculation: {lve_flag}")
-    print("")
     if av_bonds_flag:
+        print("")
         print(f"Average bond number calculation: {av_bonds_flag}")
-    print("")
     if voronoi_flag:
+        print("")
         print(f"Average voronoi volume calculation: {voronoi_flag}")
     print("-------------------------")
 
