@@ -5,7 +5,7 @@ from post_process_jfsd.msd import calculate_msd
 from post_process_jfsd.av_stress import caclulate_average_stress, calculate_particle_stress_correction
 from post_process_jfsd.npy_to_xyz import npy_to_xyz
 from post_process_jfsd.gofr_2d import gofxy_image
-from post_process_jfsd.gofr import gofr
+from post_process_jfsd.gofr import gofr, Sofk_from_gofr
 from post_process_jfsd.velocity_profile import vel_profile
 from post_process_jfsd.msdtolve import msd_to_lve
 from post_process_jfsd.bonds import average_bonds_number, average_voronoi_volume
@@ -41,6 +41,8 @@ def main():
         gofxy_flag = False
 
         gofr_flag = False
+        sofk_flag = False
+        py_sofk_flag = False
 
         v_profile_flag = False
         
@@ -68,6 +70,8 @@ def main():
         Ymax = float(settings_file['gofxy']['Ymax'])
 
         gofr_flag = bool(settings_file['gofr']['gofr_calculation'])
+        sofk_flag = bool(settings_file['gofr']['sofk_calculation'])
+        py_sofk_flag = bool(settings_file['gofr']['perkus_yevik_correction'])
         gofr_frame = int(settings_file['gofr']['frame'])
         N_gofr_bins = int(settings_file['gofr']['N_gofr_bins'])
         gofr_r_max = float(settings_file['gofr']['r_max'])
@@ -105,6 +109,9 @@ def main():
     print(f"g(r) calculation is: {gofr_flag}")
     if gofr_flag:
         print(f"Frame = {gofr_frame}")
+        print(f"S(k) calculation from g(r) is: {sofk_flag}")
+        if sofk_flag:
+            print(f"Perkus-Yevik S(k) output is: {py_sofk_flag}")
     print("")
     print(f"g(r) on xy plane calculation: {gofxy_flag}")
     if gofxy_flag:
@@ -141,7 +148,9 @@ def main():
 
     if gofr_flag:
         print("Calculating g(r)...")
-        gofr(trajectory, gofr_frame, last_frame_index, input_params, N_gofr_bins, gofr_r_max, fileout)
+        r_values, g_of_r = gofr(trajectory, gofr_frame, last_frame_index, input_params, N_gofr_bins, gofr_r_max, fileout)
+        if sofk_flag:
+            Sofk_from_gofr(r_values, g_of_r, input_params, py_sofk_flag, fileout)
     
     if gofxy_flag:
         print("Calculating g(r) on xy plane...")

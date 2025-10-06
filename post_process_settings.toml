@@ -23,6 +23,8 @@ Ymax = 4.0
 
 [gofr]
 gofr_calculation = true
+sofk_calculation = true
+perkus_yevik_correction = true
 N_gofr_bins = 80
 frame = -1
 r_max = 5.0
