@@ -3,20 +3,38 @@ from numpy import ndarray as Array
 from matplotlib import pyplot as plt
 import cmcrameri.cm as cmc
 
+from post_process_jfsd.utils import calculate_distances
+
 
 def gofxy_for_frame(trajectory: Array, 
                     x_bins: Array, 
                     y_bins: Array, 
                     Xmax: float, Ymax: float, 
                     N: int, 
-                    slice_width: float, 
+                    slice_width: float,
+                    box_length: float, 
                     frame: int) -> Array:
     """
     Function to calculate the gofxy for a specific frame
 
     Parameters
     -----------
-    
+    trajectory: (Array)
+        The positions array of shape (N,3)
+    x_bins: (Array)
+        Bins in the x dimension
+    y_bins: (Array)
+        Bins in the y dimension    
+    Xmax: (float)
+        Maximum x value
+    Ymax: (float)
+        Maximum y value
+    N: (int)
+        Number of particles
+    slice_width: (float)
+        z length of the slice to average the g(r)
+    box_length: (float)
+        The size of the square box
     frame: (int)
            Frame indice to be calculated
 
@@ -27,8 +45,7 @@ def gofxy_for_frame(trajectory: Array,
     positions = trajectory[frame]
 
     # Calculate interparticle distances
-    distance_vectors = np.zeros((N, N, 3))
-    distance_vectors = positions[:, np.newaxis, :] - positions[np.newaxis, :, :]  # shape: (N, N, 3)
+    distance_vectors = calculate_distances(positions, N, box_length)
 
     # Select only the particles within the slice and remove the self contribution
     indices = np.where(np.abs(distance_vectors[:,:,2]) < slice_width, 1, 0)
@@ -110,7 +127,7 @@ def gofxy_image(
     X, Y = np.meshgrid(xedges, yedges)
 
     if subtract_rest==True:
-        gofxy_to_be_plotted = gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame) - gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, frame = 0)
+        gofxy_to_be_plotted = gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, box_length, frame) - gofxy_for_frame(trajectory, x_bins, y_bins, Xmax, Ymax, N, slice_width, box_length,  frame = 0)
         plt.pcolormesh(X, Y, gofxy_to_be_plotted, cmap=cmc.berlin)
         title_add = "_zeroth_frame_subtracted"
     else:

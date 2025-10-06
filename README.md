@@ -9,6 +9,9 @@ Currently includes:
 - Calculation of the radial distribution function g(r)
 - Calculation of the xy projection of the g(r)
 - Calculation of the velocity profile
+- Calculation of average and standard deviation of number of particle bonds
+- Caclulation of average particle voronoi volume
+- Calculation of structure factor from the fourier transform of g(r) and output the Percus-Yevic hard sphere S(k)
 - Creation of an ovito/vmd compatible .xyz file for the particle trajectories
 
 ## Installation
@@ -34,6 +37,7 @@ Else, only the MSD and average stress is calculated by default.
 
 - Python >= 3.10
 - numpy
+- jax >= 0.4.17
 - matplotlib
 - scipy
 - freud_analysis

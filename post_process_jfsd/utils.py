@@ -2,6 +2,9 @@ import numpy as np
 from numpy import ndarray as Array
 import toml
 import os
+from jax import jit
+import jax.numpy as jnp
+from functools import partial
 from scipy.stats import binned_statistic
 
 
@@ -101,6 +104,40 @@ def simulation_parameters(trajectory: Array) -> tuple[int, int, float, int, Arra
     tb = 1.0 / kT
 
     return (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb)
+
+@partial(jit, static_argnums=[1,2])
+def calculate_distances(positions: Array, N: int, box_length: float) -> Array:
+    """
+    A function to calculate the distance matrix between all particles for a given frame. Utilizes jax and jit.
+    It also applies the minimum image convention
+
+    Parameters
+    -------------
+    positions: (Array)
+        The positions of the particles of shape (N, 3)
+    N: (int)
+        The number of particles
+    box_length: (float)
+        The length of the square box
+
+    Returns
+    -------------
+    distances: (Array)
+        The distances of the particles of shape (N, N, 3)
+    """
+    # Calculate interparticle distances and distance norm
+    distance_vectors = jnp.zeros((N, N, 3))
+    distance_vectors = positions[:, jnp.newaxis, :] - positions[jnp.newaxis, :, :]  # shape: (N, N, 3)
+
+    # Adjust if the displacement is > half the box length (positive direction)
+    distance_vectors = jnp.where(distance_vectors > 0.5*box_length, distance_vectors - box_length, distance_vectors)
+
+    # Adjust if the displacement is < half the box length (negative direction)
+    distance_vectors = jnp.where(distance_vectors < -0.5*box_length, distance_vectors + box_length, distance_vectors)
+
+
+    return distance_vectors
+
 
 
 def log_bin_stat(time: Array, data: Array, num_bins=80) -> tuple[Array, Array]:
