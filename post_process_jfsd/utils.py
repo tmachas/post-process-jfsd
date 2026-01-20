@@ -195,3 +195,18 @@ def lin_bin_stat(time: Array, data: Array, box_size: float, num_bins=80)-> tuple
     
     return bin_centers, bin_means
 
+
+def write_file(caclulation: str, fileout: str, **kwargs):
+
+    # Make the header
+    for key in kwargs.keys():
+        header += (f"{key:19s}")
+
+    # Write the data in a single npy array
+    columns = (*kwargs.values(),)
+    data = np.transpose(np.vstack(columns))
+
+    # Save the data
+    np.savetxt(f"{caclulation}{fileout}.dat", data, header= header)
+    
+    return
