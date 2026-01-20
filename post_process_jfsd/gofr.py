@@ -2,6 +2,7 @@ import numpy as np
 from numpy import ndarray as Array
 import freud
 from scipy.integrate import simps
+
 from post_process_jfsd.utils import write_file
 
 def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float, fileout: str) -> tuple[Array, Array]:
@@ -54,14 +55,14 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     write_file("gofr", fileout, roverR = r_values, gofr = gofr)
 
-
+    """
     # Write the output in a file
     file = open("gofr"+fileout+".dat","w+")
     file.write("r/R   g(r)\n")
     for i in range(len(r_values)):
         file.write(str(r_values[i])+"   "+str(gofr[i])+"\n")
     file.close
-
+    """
     return r_values, gofr
 
 
