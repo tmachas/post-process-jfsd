@@ -199,6 +199,7 @@ def lin_bin_stat(time: Array, data: Array, box_size: float, num_bins=80)-> tuple
 def write_file(caclulation: str, fileout: str, **kwargs):
 
     # Make the header
+    header = ""
     for key in kwargs.keys():
         header += (f"{key:19s}")
 
