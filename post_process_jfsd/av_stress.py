@@ -4,6 +4,7 @@ from jax import jit
 import jax.numpy as jnp
 
 from post_process_jfsd.utils import log_bin_stat, calculate_distances
+from post_process_jfsd.utils import write_file
 
 def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str, spring_const = 2500.0) -> tuple[Array, Array]:
     """
@@ -92,18 +93,11 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
 
     binned_times, binned_stress_xy = log_bin_stat(time, np.transpose(stress_tensor_reshaped)[1], num_bins=80)
 
-    file = open("ParticleStressaveraged"+fileout+".dat","w+")
-    file.write("\g(g)   \g(s)\-(xy)\n")
-    for i in range(len(binned_times)):
-        file.write(str(binned_times[i] * shear_rate)+"   "+str(binned_stress_xy[i])+"\n")
-    file.close
+    write_file("ParticleStressaveraged", fileout, g = binned_times*shear_rate, sigmaxy = binned_stress_xy)
+
 
     if raw_stress_flag:
-        file = open("ParticleStress"+fileout+".dat","w+")
-        file.write("\g(g)   \g(s)\-(xy)\n")
-        for i in range(len(time)):
-            file.write(str(time[i]*shear_rate)+"   "+str(np.transpose(stress_tensor_reshaped)[1][i])+"\n")
-        file.close
+        write_file("ParticleStress", fileout, g = time*shear_rate, sigmaxy = np.transpose(stress_tensor_reshaped)[1])
 
     return time*shear_rate, binned_stress_xy
 

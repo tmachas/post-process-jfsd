@@ -55,14 +55,6 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     write_file("gofr", fileout, roverR = r_values, gofr = gofr)
 
-    """
-    # Write the output in a file
-    file = open("gofr"+fileout+".dat","w+")
-    file.write("r/R   g(r)\n")
-    for i in range(len(r_values)):
-        file.write(str(r_values[i])+"   "+str(gofr[i])+"\n")
-    file.close
-    """
     return r_values, gofr
 
 
@@ -147,19 +139,11 @@ def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theor
     if py_theory_flag:
         py_sofk = py_structure_factor(k_values, 4.0/3.0*N*np.pi/(box_length**3))
 
-        file = open("Sofk"+fileout+".dat","w+")
-        file.write("kR   S(k)   PY_S(k)\n")
-        for i in range(len(k_values)):
-            file.write(str(k_values[i])+"   "+str(structure_factor[i])+"   "+str(py_sofk[i])+"\n")
-        file.close
+        write_file("Sofq", fileout, kR = k_values, Sofq = structure_factor, PY_Sofq = py_sofk)
     else:
         py_sofk = None
 
-        file = open("Sofk"+fileout+".dat","w+")
-        file.write("kR   S(k)\n")
-        for i in range(len(k_values)):
-            file.write(str(k_values[i])+"   "+str(structure_factor[i])+"\n")
-        file.close
+        write_file("Sofq", fileout, kR = k_values, Sofq = structure_factor)
 
     return r_values, structure_factor, py_sofk
     
