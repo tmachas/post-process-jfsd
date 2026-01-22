@@ -3,9 +3,8 @@ from numpy import ndarray as Array
 import freud
 from scipy.integrate import simps
 
-from post_process_jfsd.utils import write_file
 
-def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float, fileout: str) -> tuple[Array, Array]:
+def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float) -> tuple[Array, Array]:
     """
     A function to calculate the radial distribution function for a given trajectory
 
@@ -24,8 +23,6 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
         Number of g(r) bins
     r_max: (float)
         Maximum r for g(r) calculation
-    fileout: (str)
-        The name of the parent directory
 
     Returns
     ------------
@@ -53,12 +50,11 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     gofr = gofr_calculator.rdf
 
-    write_file("gofr", fileout, roverR = r_values, gofr = gofr)
 
     return r_values, gofr
 
 
-def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theory_flag: bool, fileout: str): 
+def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theory_flag: bool): 
     """
     Compute static structure factor S(k) from g(r).
     
@@ -139,11 +135,8 @@ def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theor
     if py_theory_flag:
         py_sofk = py_structure_factor(k_values, 4.0/3.0*N*np.pi/(box_length**3))
 
-        write_file("Sofq", fileout, kR = k_values, Sofq = structure_factor, PY_Sofq = py_sofk)
     else:
         py_sofk = None
-
-        write_file("Sofq", fileout, kR = k_values, Sofq = structure_factor)
 
     return r_values, structure_factor, py_sofk
     

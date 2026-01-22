@@ -196,18 +196,26 @@ def lin_bin_stat(time: Array, data: Array, box_size: float, num_bins=80)-> tuple
     return bin_centers, bin_means
 
 
-def write_file(caclulation: str, fileout: str, **kwargs):
 
-    # Make the header
-    header = ""
-    for key in kwargs.keys():
-        header += (f"{key:19s}")
+class WriteFile:
+    def __init__(self, fileout: str):
+        self.fileout = fileout
 
-    # Write the data in a single npy array
-    columns = (*kwargs.values(),)
-    data = np.transpose(np.vstack(columns))
 
-    # Save the data
-    np.savetxt(f"{caclulation}{fileout}.dat", data, header= header)
-    
-    return
+    def write_file(self, caclulation: str, names: list, output: tuple):
+        # Create the dictionary
+        dict = {names[i]:output[i] for i in range(len(output))}
+
+        # Make the header
+        header = ""
+        for key in dict.keys():
+            header += (f"{key:25s}")
+
+        # Write the data in a single npy array
+        columns = output
+        data = np.transpose(np.vstack(columns))
+
+        # Save the data
+        np.savetxt(f"{caclulation}{self.fileout}.dat", data, header= header, comments= "")
+        
+        return

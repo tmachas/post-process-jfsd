@@ -3,7 +3,7 @@ from numpy import ndarray as Array
 import freud
 
 
-def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: bool, fileout: str) -> tuple[Array, Array]:
+def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: bool) -> tuple[Array, Array]:
     """
     Function to calculate the msd from the unwrapped trajectory
     
@@ -15,8 +15,6 @@ def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: boo
         The input parameters
     windowed_msd_flag: (bool)
         Flag whether the windowed or direct msd is calculated
-    fileout: (str)
-        The name of the parent directory (for naming the output files)
 
     Returns
     -----------
@@ -51,10 +49,8 @@ def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: boo
     # Initialize the MSD calculator
     if windowed_msd_flag:
         msd_mode = 'window'
-        fileoutadd = ''
     else:
         msd_mode = 'direct'
-        fileoutadd = 'direct'
 
     msd_calculator = freud.msd.MSD(mode=msd_mode)
 
@@ -64,10 +60,4 @@ def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: boo
     # Retrieve the mean squared displacement results
     msd = msd_calculator.msd
 
-    file=open("MSD"+fileoutadd+fileout+".dat","w+") #storing the unwrappped MSD
-    file.write("t/t\-(B)    MSD\n")
-    for i in range(n_steps-1):
-        file.write(str(time[i+1]/tb)+"   "+str(msd[i+1])+"\n")
-    file.close
-
-    return time/tb, msd
+    return (time/tb, msd)

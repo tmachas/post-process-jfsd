@@ -10,7 +10,7 @@ from post_process_jfsd.velocity_profile import vel_profile
 from post_process_jfsd.msdtolve import msd_to_lve
 from post_process_jfsd.bonds import average_bonds_number, average_voronoi_volume
 
-
+from post_process_jfsd.utils import WriteFile
 
 
 def main():
@@ -132,25 +132,45 @@ def main():
     print("-------------------------")
 
 
-    # Get the directory name
+    # Get the directory name and initialize the file writer
     fileout = dir_name()
+    writer = WriteFile(fileout)
 
     # Calculate the msd
     if msd_flag:
         print("Calculating MSD...")
-        calculate_msd(trajectory, input_params, msd_windowed_flag, fileout)
+        if msd_windowed_flag:
+            calculation = 'MSD'
+        else:
+            calculation = 'MSDdirect'
+        
+        quantities = ["time/tb", "MSD"]
+        writer.write_file(calculation, quantities, calculate_msd(trajectory, input_params, msd_windowed_flag))
 
+    # Calculate the stresses
     if av_stress_flag:
         print("Calculating stresses...")
-        caclulate_average_stress(stresslet, input_params, raw_stress_flag, N_stress_bins, fileout)
-        if xF_flag:
-            calculate_particle_stress_correction(trajectory, input_params, raw_stress_flag, fileout)
+        if raw_stress_flag:
+            name_add = "raw"
+        else: 
+            name_add = ""
 
+        quantities = ["time/tb", "\g(g)", "S_xy", "S_xx", "S_yy", "S_zz"]
+        writer.write_file("AVST"+name_add, quantities, caclulate_average_stress(stresslet, input_params, raw_stress_flag, N_stress_bins))
+        if xF_flag:
+            quantities = ["\g(g)", "S_xy"]
+            writer.write_file("ParticleStress"+name_add, quantities, calculate_particle_stress_correction(trajectory, input_params, raw_stress_flag))
+
+    # Calculate gofr
     if gofr_flag:
         print("Calculating g(r)...")
-        r_values, g_of_r = gofr(trajectory, gofr_frame, last_frame_index, input_params, N_gofr_bins, gofr_r_max, fileout)
+        quantities = ["r/R", "g(r)"]
+        output = gofr(trajectory, gofr_frame, last_frame_index, input_params, N_gofr_bins, gofr_r_max)
+        writer.write_file("gofr", quantities, output)
+
         if sofk_flag:
-            Sofk_from_gofr(r_values, g_of_r, input_params, py_sofk_flag, fileout)
+            quantities = ["kR", "S(q)"]
+            writer.write_file("Sofq", quantities, Sofk_from_gofr(*output, input_params, py_sofk_flag))
     
     if gofxy_flag:
         print("Calculating g(r) on xy plane...")
@@ -158,7 +178,8 @@ def main():
 
     if v_profile_flag:
         print("Calculating velocity profile...")
-        vel_profile(trajectory, velocities, input_params, v_profile_bins, fileout)
+        quantities = ["y/R", "v", "v_real"]
+        writer.write_file("VelProfile", quantities, vel_profile(trajectory, velocities, input_params, v_profile_bins))
 
     if ovito_flag:
         print("Writing ovito file...")
@@ -166,15 +187,18 @@ def main():
 
     if lve_flag:
         print("Calculating LVE spectrum...")
-        msd_to_lve(fileout)
+        quantities = ["\g(w)","G'","G''"]
+        writer.write_file("LVEfromMSD", quantities, msd_to_lve(fileout))
 
     if av_bonds_flag:
         print("Caclulating average bonds...")
-        average_bonds_number(trajectory, input_params, fileout)
+        quantities = ["t/tb","<Z>", "ΔZ"]
+        writer.write_file("Bonds", quantities, average_bonds_number(trajectory, input_params))
 
     if voronoi_flag:
         print("Caclulating average voronoi volume...")
-        average_voronoi_volume(trajectory, input_params, fileout)
+        quantities = ["t/tb","AvVoroV"]
+        writer.write_file("VoroVolume", quantities, average_voronoi_volume(trajectory, input_params))
     
     print("Done!")
 
