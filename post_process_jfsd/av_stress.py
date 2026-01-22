@@ -71,7 +71,7 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
     
     
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Potential characteristics
     k = spring_const / dt
@@ -134,7 +134,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     """
 
     # Get the simulation parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
     
     #Take ensemble average
     av_stresslet = np.average(stresslet, 1)
@@ -143,7 +143,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     if raw_stress_flag == True: # store the only-particle averaged stress
         raw_stresslet = av_stresslet * N / (box_length**3) / kT # Translate the stresslet to the stress tensor and normalize
 
-        return time/tb, time*shear_rate, raw_stresslet[1], raw_stresslet[0], raw_stresslet[2], 0.0 - raw_stresslet[0] - raw_stresslet[2]
+        return time*kT, time*shear_rate, raw_stresslet[1], raw_stresslet[0], raw_stresslet[2], 0.0 - raw_stresslet[0] - raw_stresslet[2]
 
     #Prepare the stresslets for the binning
     xy_stresslet = av_stresslet[:,[1]].ravel()
@@ -163,4 +163,4 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     binned_stresslet_yy = binned_stresslet_yy * N / (box_length**3) / kT
     binned_stresslet_zz = binned_stresslet_zz * N / (box_length**3) / kT
 
-    return binned_times/tb, binned_times*shear_rate, binned_stresslet_xy, binned_stresslet_xx, binned_stresslet_yy, binned_stresslet_zz
+    return binned_times*kT, binned_times*shear_rate, binned_stresslet_xy, binned_stresslet_xx, binned_stresslet_yy, binned_stresslet_zz

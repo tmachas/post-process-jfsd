@@ -101,9 +101,8 @@ def simulation_parameters(trajectory: Array) -> tuple[int, int, float, int, Arra
 
     shear_rate = float(input_file['physics']['shear_rate'])
     box_length = float(input_file['box']['Lx'])
-    tb = 1.0 / kT
 
-    return (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb)
+    return (n_steps, N, dt, period, time, kT, shear_rate, box_length)
 
 @partial(jit, static_argnums=[1,2])
 def calculate_distances(positions: Array, N: int, box_length: float) -> Array:

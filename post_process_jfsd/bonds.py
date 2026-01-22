@@ -30,7 +30,7 @@ def average_bonds_number(trajectory: Array, input_params: tuple, attr_range = 0.
     bonded_radius = 2.0*(1.0 + attr_range)
 
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the return arrays
     av_bonds = np.zeros((n_steps))
@@ -52,7 +52,7 @@ def average_bonds_number(trajectory: Array, input_params: tuple, attr_range = 0.
         av_bonds[step] = np.average(bonds_per_particle)
         std_bonds[step] = np.std(bonds_per_particle)
         
-    return time/tb, av_bonds, std_bonds
+    return time*kT, av_bonds, std_bonds
 
 
 def average_voronoi_volume(trajectory: Array, input_params: tuple) -> tuple[Array, Array]:
@@ -75,7 +75,7 @@ def average_voronoi_volume(trajectory: Array, input_params: tuple) -> tuple[Arra
     """
 
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the voronoi calculator
     voronoi_volumes = np.zeros((n_steps, N))
@@ -90,4 +90,4 @@ def average_voronoi_volume(trajectory: Array, input_params: tuple) -> tuple[Arra
 
     av_voro_volume = np.average(voronoi_volumes, axis=1)
 
-    return time/tb, av_voro_volume
+    return time*kT, av_voro_volume

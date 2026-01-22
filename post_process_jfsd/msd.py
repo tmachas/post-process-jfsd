@@ -24,7 +24,7 @@ def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: boo
         The calculated msds 
 
     """
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Define the box dimensions (assuming a cubic box for simplicity)
     half_box_length = box_length / 2.0
@@ -60,4 +60,4 @@ def calculate_msd(trajectory: Array, input_params: tuple, windowed_msd_flag: boo
     # Retrieve the mean squared displacement results
     msd = msd_calculator.msd
 
-    return (time/tb, msd)
+    return (time*kT, msd)

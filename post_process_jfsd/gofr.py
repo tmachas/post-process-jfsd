@@ -39,7 +39,7 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     positions = trajectory[frame]
     
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the calculator, set the r_values and make the freud box
     gofr_calculator = freud.density.RDF(bins = N_gofr_bins, r_max = r_max)
@@ -113,7 +113,7 @@ def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theor
     
     S_k = []
 
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Testing if zero belongs to the r_values (if it belongs, it will be the first one) and deleting it
     if r_values[0] == 0.0:

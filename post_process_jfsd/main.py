@@ -91,7 +91,7 @@ def main():
 
     # Load the simulation parameters
     input_params = simulation_parameters(trajectory)
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     print("Post processing parameters")
     print("-------------------------")
@@ -100,7 +100,7 @@ def main():
         print(f"Windowed msd: {msd_windowed_flag}")
     print("")
     if av_stress_flag:
-        print(f"Stress calculation: {av_stress_flag} with Pe = {shear_rate*tb}")
+        print(f"Stress calculation: {av_stress_flag} with Pe = {shear_rate/kT}")
         print(f"    Raw stress: {raw_stress_flag}")
         print(f"    <xF> correction: {xF_flag}")
     else:
@@ -183,7 +183,7 @@ def main():
 
     if ovito_flag:
         print("Writing ovito file...")
-        npy_to_xyz(trajectory, fileout)
+        npy_to_xyz(trajectory, fileout, dt*kT*period)
 
     if lve_flag:
         print("Calculating LVE spectrum...")
