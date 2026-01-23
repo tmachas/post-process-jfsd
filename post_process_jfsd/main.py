@@ -80,6 +80,7 @@ def main():
         v_profile_bins = int(settings_file['velocity_profile']['N_bins'])
 
         ovito_flag = bool(settings_file['ovito_file']['xyz_file'])
+        unwrapped_toggle = bool(settings_file['ovito_file']['unwrap_positions'])
 
         lve_flag = bool(settings_file['MSD_to_LVE']['lve_calculation'])
 
@@ -189,7 +190,7 @@ def main():
     # Make the ovito file
     if ovito_flag:
         print("Writing ovito file...")
-        npy_to_xyz(trajectory, fileout, dt*kT*period)
+        npy_to_xyz(trajectory, fileout, dt*kT*period, box_length, unwrapped_toggle)
 
     # Calculate the lve spectrum from the MSD
     if lve_flag:

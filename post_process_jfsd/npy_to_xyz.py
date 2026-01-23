@@ -1,6 +1,8 @@
 from numpy import ndarray as Array
 
-def npy_to_xyz(trajectory: Array, fileout: str, dt_per_tb_times_period: float, atom_type='C'):
+from post_process_jfsd.utils import unwrap_trajectory
+
+def npy_to_xyz(trajectory: Array, fileout: str, dt_per_tb_times_period: float, box_length: float, unwrapped_toggle: bool, atom_type='C'):
     """
     Converts a .npy trajectory to an .xyz file.
 
@@ -11,11 +13,18 @@ def npy_to_xyz(trajectory: Array, fileout: str, dt_per_tb_times_period: float, a
             Name of the parent directory
         dt_per_tb_times_period: (float)
             The normilized simulation time step ,multiplied but the writing step
+        box_length: (float)
+            Size of simulation box
+        unwrapped_toggle: (bool)
+            Toggle whether to output the unwrapped trajectory
         atom_type: (str) 
             Atom type to label in the XYZ file (default: 'C').
     """
     
     frames, atoms, _ = trajectory.shape
+
+    if unwrapped_toggle:
+        trajectory = unwrap_trajectory(trajectory, box_length)
 
     with open(fileout+".xyz", 'w') as f:
         for frame in range(frames):

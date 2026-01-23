@@ -137,7 +137,42 @@ def calculate_distances(positions: Array, N: int, box_length: float) -> Array:
 
     return distance_vectors
 
+def unwrap_trajectory(trajectory: Array, box_length: float) -> Array:
+    """
+    Function to unwrap particle positions
+    
+    Parameters
+    ----------
+    trajectory: (Array)
+        Input array (wrarpped positions)
+    box_length: (float)
+        Size of simulation box
 
+    Returns
+    ----------
+    unwrapped_trajectory: (Array)
+        Unwrapped particle positions
+    """
+
+    # Define the box dimensions (assuming a cubic box for simplicity)
+    half_box_length = box_length / 2.0
+
+    # Initialize an array to store the unwrapped trajectory
+    unwrapped_trajectory = np.zeros_like(trajectory)
+    unwrapped_trajectory[0] = trajectory[0]  # Start with the first frame as is
+
+    # Unwrap the trajectory by checking for boundary crossings
+    for t in range(1, trajectory.shape[0]):
+        delta = trajectory[t] - trajectory[t - 1]
+        
+        # Apply the minimum image convention for each particle
+        delta[delta > half_box_length] -= box_length  # Adjust if the displacement is > half the box length (positive direction)
+        delta[delta < -half_box_length] += box_length  # Adjust if the displacement is < -half the box length (negative direction)
+
+        # Update the unwrapped position
+        unwrapped_trajectory[t] = unwrapped_trajectory[t - 1] + delta
+
+    return unwrapped_trajectory
 
 def log_bin_stat(time: Array, data: Array, num_bins=80) -> tuple[Array, Array]:
     """
