@@ -143,7 +143,7 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     if raw_stress_flag == True: # store the only-particle averaged stress
         raw_stresslet = av_stresslet * N / (box_length**3) / kT # Translate the stresslet to the stress tensor and normalize
 
-        return time*kT, time*shear_rate, raw_stresslet[1], raw_stresslet[0], raw_stresslet[2], 0.0 - raw_stresslet[0] - raw_stresslet[2]
+        return time*kT, time*shear_rate, raw_stresslet[:,1], raw_stresslet[:,0], raw_stresslet[:,2], 0.0 - raw_stresslet[:,0] - raw_stresslet[:,2]
 
     #Prepare the stresslets for the binning
     xy_stresslet = av_stresslet[:,[1]].ravel()

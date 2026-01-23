@@ -169,32 +169,41 @@ def main():
         writer.write_file("gofr", quantities, output)
 
         if sofk_flag:
-            quantities = ["kR", "S(q)"]
+            if py_sofk_flag:
+                quantities = ["kR", "S(q)", "PY_S(q)"]
+            else:
+                quantities = ["kR", "S(q)"]
             writer.write_file("Sofq", quantities, Sofk_from_gofr(*output, input_params, py_sofk_flag))
     
+    # Calculate gofrxy
     if gofxy_flag:
         print("Calculating g(r) on xy plane...")
         gofxy_image(trajectory, input_params, last_frame_index, gofxy_frame, gofxy_subtract_rest_flag, fileout, gofxy_slice_width, N_gofxy_bins, Xmax, Ymax)
 
+    # Calculate the velocity profile
     if v_profile_flag:
         print("Calculating velocity profile...")
         quantities = ["y/R", "v", "v_real"]
         writer.write_file("VelProfile", quantities, vel_profile(trajectory, velocities, input_params, v_profile_bins))
 
+    # Make the ovito file
     if ovito_flag:
         print("Writing ovito file...")
         npy_to_xyz(trajectory, fileout, dt*kT*period)
 
+    # Calculate the lve spectrum from the MSD
     if lve_flag:
         print("Calculating LVE spectrum...")
         quantities = ["\g(w)","G'","G''"]
         writer.write_file("LVEfromMSD", quantities, msd_to_lve(fileout))
 
+    # Calculate average bonds
     if av_bonds_flag:
         print("Caclulating average bonds...")
         quantities = ["t/tb","<Z>", "ΔZ"]
         writer.write_file("Bonds", quantities, average_bonds_number(trajectory, input_params))
 
+    # Calculate the average voronoi volume
     if voronoi_flag:
         print("Caclulating average voronoi volume...")
         quantities = ["t/tb","AvVoroV"]
