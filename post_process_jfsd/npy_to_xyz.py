@@ -28,7 +28,7 @@ def npy_to_xyz(trajectory: Array, fileout: str, dt_per_tb_times_period: float, b
 
     with open(fileout+".xyz", 'w') as f:
         for frame in range(frames):
-            f.write(f"{atoms}\n")
+            f.write(f"{atoms:.4f}\n")
             f.write(f"t/τΒ = {(frame + 1)*dt_per_tb_times_period}\n")
             for atom in range(atoms):
                 x, y, z = trajectory[frame][atom]
