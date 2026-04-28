@@ -3,7 +3,8 @@ from numpy import ndarray as Array
 import freud
 from scipy.integrate import simps
 
-def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float, fileout: str) -> tuple[Array, Array]:
+
+def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tuple, N_gofr_bins: int, r_max: float) -> tuple[Array, Array]:
     """
     A function to calculate the radial distribution function for a given trajectory
 
@@ -22,8 +23,6 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
         Number of g(r) bins
     r_max: (float)
         Maximum r for g(r) calculation
-    fileout: (str)
-        The name of the parent directory
 
     Returns
     ------------
@@ -40,7 +39,7 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     positions = trajectory[frame]
     
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the calculator, set the r_values and make the freud box
     gofr_calculator = freud.density.RDF(bins = N_gofr_bins, r_max = r_max)
@@ -51,17 +50,11 @@ def gofr(trajectory: Array, frame: int, last_frame_index: int, input_params: tup
 
     gofr = gofr_calculator.rdf
 
-    # Write the output in a file
-    file = open("gofr"+fileout+".dat","w+")
-    file.write("r/R   g(r)\n")
-    for i in range(len(r_values)):
-        file.write(str(r_values[i])+"   "+str(gofr[i])+"\n")
-    file.close
 
     return r_values, gofr
 
 
-def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theory_flag: bool, fileout: str): 
+def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theory_flag: bool): 
     """
     Compute static structure factor S(k) from g(r).
     
@@ -120,7 +113,7 @@ def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theor
     
     S_k = []
 
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Testing if zero belongs to the r_values (if it belongs, it will be the first one) and deleting it
     if r_values[0] == 0.0:
@@ -142,19 +135,8 @@ def Sofk_from_gofr(r_values: Array, g_of_r: Array, input_params: tuple, py_theor
     if py_theory_flag:
         py_sofk = py_structure_factor(k_values, 4.0/3.0*N*np.pi/(box_length**3))
 
-        file = open("Sofk"+fileout+".dat","w+")
-        file.write("kR   S(k)   PY_S(k)\n")
-        for i in range(len(k_values)):
-            file.write(str(k_values[i])+"   "+str(structure_factor[i])+"   "+str(py_sofk[i])+"\n")
-        file.close
     else:
         py_sofk = None
-
-        file = open("Sofk"+fileout+".dat","w+")
-        file.write("kR   S(k)\n")
-        for i in range(len(k_values)):
-            file.write(str(k_values[i])+"   "+str(structure_factor[i])+"\n")
-        file.close
 
     return r_values, structure_factor, py_sofk
     

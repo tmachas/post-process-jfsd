@@ -36,14 +36,9 @@ def msd_to_lve(fileout: str) -> tuple[Array, Array, Array] :
 
         trajectory, _, _, _ = load_and_check(False)
         input_params = simulation_parameters(trajectory)
-        calculate_msd(trajectory, input_params, fileout)
-
+        columns = calculate_msd(trajectory, input_params, fileout)
+        data = np.vstack(columns)
         print("MSD calculated!")
-        try:
-            data = np.loadtxt("MSD"+fileout+".dat", skiprows=1)
-        except FileNotFoundError:
-            print("MSD file still not found. Something else is wrong. Abort!")
-            exit()
     # Transpose the data to read them properly
     data = np.transpose(data)
 
@@ -80,12 +75,5 @@ def msd_to_lve(fileout: str) -> tuple[Array, Array, Array] :
     omega = np.array(omega)
     Gp = np.array(Gp)
     Gdp = np.array(Gdp)
-
-    # Write the output in a file
-    file = open("LVEfromMSD"+fileout+".dat","w+")
-    file.write("\g(w)   Gp   Gpp\n")
-    for i in range(len(omega)):
-        file.write(str(omega[i])+"   "+str(Gp[i])+"   "+str(Gdp[i])+"\n")
-    file.close
 
     return omega, Gp, Gdp

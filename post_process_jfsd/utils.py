@@ -101,9 +101,8 @@ def simulation_parameters(trajectory: Array) -> tuple[int, int, float, int, Arra
 
     shear_rate = float(input_file['physics']['shear_rate'])
     box_length = float(input_file['box']['Lx'])
-    tb = 1.0 / kT
 
-    return (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb)
+    return (n_steps, N, dt, period, time, kT, shear_rate, box_length)
 
 @partial(jit, static_argnums=[1,2])
 def calculate_distances(positions: Array, N: int, box_length: float) -> Array:
@@ -138,7 +137,42 @@ def calculate_distances(positions: Array, N: int, box_length: float) -> Array:
 
     return distance_vectors
 
+def unwrap_trajectory(trajectory: Array, box_length: float) -> Array:
+    """
+    Function to unwrap particle positions
+    
+    Parameters
+    ----------
+    trajectory: (Array)
+        Input array (wrarpped positions)
+    box_length: (float)
+        Size of simulation box
 
+    Returns
+    ----------
+    unwrapped_trajectory: (Array)
+        Unwrapped particle positions
+    """
+
+    # Define the box dimensions (assuming a cubic box for simplicity)
+    half_box_length = box_length / 2.0
+
+    # Initialize an array to store the unwrapped trajectory
+    unwrapped_trajectory = np.zeros_like(trajectory)
+    unwrapped_trajectory[0] = trajectory[0]  # Start with the first frame as is
+
+    # Unwrap the trajectory by checking for boundary crossings
+    for t in range(1, trajectory.shape[0]):
+        delta = trajectory[t] - trajectory[t - 1]
+        
+        # Apply the minimum image convention for each particle
+        delta[delta > half_box_length] -= box_length  # Adjust if the displacement is > half the box length (positive direction)
+        delta[delta < -half_box_length] += box_length  # Adjust if the displacement is < -half the box length (negative direction)
+
+        # Update the unwrapped position
+        unwrapped_trajectory[t] = unwrapped_trajectory[t - 1] + delta
+
+    return unwrapped_trajectory
 
 def log_bin_stat(time: Array, data: Array, num_bins=80) -> tuple[Array, Array]:
     """
@@ -195,3 +229,27 @@ def lin_bin_stat(time: Array, data: Array, box_size: float, num_bins=80)-> tuple
     
     return bin_centers, bin_means
 
+
+
+class WriteFile:
+    def __init__(self, fileout: str):
+        self.fileout = fileout
+
+
+    def write_file(self, caclulation: str, names: list, output: tuple):
+        # Create the dictionary
+        dict = {names[i]:output[i] for i in range(len(output))}
+
+        # Make the header
+        header = ""
+        for key in dict.keys():
+            header += (f"{key:25s}")
+
+        # Write the data in a single npy array
+        columns = output
+        data = np.transpose(np.vstack(columns))
+
+        # Save the data
+        np.savetxt(f"{caclulation}{self.fileout}.dat", data, header= header, comments= "")
+        
+        return

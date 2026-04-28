@@ -5,7 +5,7 @@ import freud
 from post_process_jfsd.utils import calculate_distances
 
 
-def average_bonds_number(trajectory: Array, input_params: tuple, fileout: str, attr_range = 0.1) -> tuple[Array, Array, Array]:
+def average_bonds_number(trajectory: Array, input_params: tuple, attr_range = 0.1) -> tuple[Array, Array, Array]:
     """
     A function to calculate the averaged over particles number of bonds, for all frames
 
@@ -15,8 +15,6 @@ def average_bonds_number(trajectory: Array, input_params: tuple, fileout: str, a
         The particles trajectory array of shape (n_steps, N, 3)
     input_params: (tuple)
         A tuple containing the input parameters
-    fileout: (str)
-        The name of the parent directory
     attr_range: (float)
         The attraction range of the depletion potential
 
@@ -32,7 +30,7 @@ def average_bonds_number(trajectory: Array, input_params: tuple, fileout: str, a
     bonded_radius = 2.0*(1.0 + attr_range)
 
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the return arrays
     av_bonds = np.zeros((n_steps))
@@ -53,17 +51,11 @@ def average_bonds_number(trajectory: Array, input_params: tuple, fileout: str, a
         # and average
         av_bonds[step] = np.average(bonds_per_particle)
         std_bonds[step] = np.std(bonds_per_particle)
-
-    file = open("AVBonds"+fileout+".dat", "w+")
-    file.write("t/\g(t)\-(B)"+"   "+"<Z>"+"   "+"\g(D)Z"+"\n")
-    for i in range(len(av_bonds)):
-        file.write(str(time[i]/tb)+"   "+str(av_bonds[i])+"   "+str(std_bonds[i])+"\n")
-    file.close
         
-    return time/tb, av_bonds, std_bonds
+    return time*kT, av_bonds, std_bonds
 
 
-def average_voronoi_volume(trajectory: Array, input_params: tuple, fileout: str) -> tuple[Array, Array]:
+def average_voronoi_volume(trajectory: Array, input_params: tuple) -> tuple[Array, Array]:
     """
     A function to calculate the averaged over particles voronoi volume for all time frames
 
@@ -73,8 +65,6 @@ def average_voronoi_volume(trajectory: Array, input_params: tuple, fileout: str)
         The particles trajectory array of shape (n_steps, N, 3)
     input_params: (tuple)
         A tuple containing the input parameters
-    fileout: (str)
-        The name of the parent directory
 
     Returns
     --------------
@@ -85,7 +75,7 @@ def average_voronoi_volume(trajectory: Array, input_params: tuple, fileout: str)
     """
 
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Initialize the voronoi calculator
     voronoi_volumes = np.zeros((n_steps, N))
@@ -100,10 +90,4 @@ def average_voronoi_volume(trajectory: Array, input_params: tuple, fileout: str)
 
     av_voro_volume = np.average(voronoi_volumes, axis=1)
 
-    file = open("VoronoiVol"+fileout+".dat", "w+")
-    file.write("t/\g(t)\-(B)"+"   "+"Voronoi_volume"+"\n")
-    for i in range(len(av_voro_volume)):
-        file.write(str(time[i]/tb)+"   "+str(av_voro_volume[i])+"\n")
-    file.close
-
-    return time/tb, av_voro_volume
+    return time*kT, av_voro_volume

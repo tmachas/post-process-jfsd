@@ -5,7 +5,7 @@ import jax.numpy as jnp
 
 from post_process_jfsd.utils import log_bin_stat, calculate_distances
 
-def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, fileout: str, spring_const = 2500.0) -> tuple[Array, Array]:
+def calculate_particle_stress_correction(trajectory: Array, input_params: tuple, raw_stress_flag: bool, spring_const = 2500.0) -> tuple[Array, Array]:
     """
     Function to calculate the <xF> term of the stress tensor and output it seperately
 
@@ -17,8 +17,6 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
         The simulation input parameters
     raw_stress_flag: (bool)
         Flag whether the only-over-particle-averaged stress is outputed
-    fileout: (str)
-        The name of the parent directory
     spring_const: (float)
         The spring constant of the harmonic hard sphere potential
 
@@ -73,7 +71,7 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
     
     
     # Untuple parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
 
     # Potential characteristics
     k = spring_const / dt
@@ -90,26 +88,18 @@ def calculate_particle_stress_correction(trajectory: Array, input_params: tuple,
     # Reshape just for my convenience
     stress_tensor_reshaped = np.reshape(stress_tensor, (n_steps, 9))
 
-    binned_times, binned_stress_xy = log_bin_stat(time, np.transpose(stress_tensor_reshaped)[1], num_bins=80)
-
-    file = open("ParticleStressaveraged"+fileout+".dat","w+")
-    file.write("\g(g)   \g(s)\-(xy)\n")
-    for i in range(len(binned_times)):
-        file.write(str(binned_times[i] * shear_rate)+"   "+str(binned_stress_xy[i])+"\n")
-    file.close
-
+    # If raw_stress_flag == True, return the only particle averaged stress. Else return the bin averaged
     if raw_stress_flag:
-        file = open("ParticleStress"+fileout+".dat","w+")
-        file.write("\g(g)   \g(s)\-(xy)\n")
-        for i in range(len(time)):
-            file.write(str(time[i]*shear_rate)+"   "+str(np.transpose(stress_tensor_reshaped)[1][i])+"\n")
-        file.close
+        return time*shear_rate, np.transpose(stress_tensor_reshaped)[1]
+    
+    else:
+        binned_times, binned_stress_xy = log_bin_stat(time, np.transpose(stress_tensor_reshaped)[1], num_bins=80)
 
-    return time*shear_rate, binned_stress_xy
-
+        return binned_times*shear_rate, binned_stress_xy
 
 
-def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_flag: bool, N_stress_bins: int, fileout: str) -> tuple[Array, Array]:
+
+def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_flag: bool, N_stress_bins: int) -> tuple[Array, Array]:
     """
     A function to calculate the logarithmic binned average of the stresslet. There is also option to save the only-particle-averaged stresslet
 
@@ -124,8 +114,6 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
         Flag the calculation of the only-particle-averaged stresslet
     N_stress_bins: (int)
         The number of bins for the stress average
-    fileout: (str)
-        The name of the parent directory, for naming the output file
 
     Returns
     -------------
@@ -146,21 +134,16 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     """
 
     # Get the simulation parameters
-    (n_steps, N, dt, period, time, kT, shear_rate, box_length, tb) = input_params
+    (n_steps, N, dt, period, time, kT, shear_rate, box_length) = input_params
     
     #Take ensemble average
     av_stresslet = np.average(stresslet, 1)
 
 
     if raw_stress_flag == True: # store the only-particle averaged stress
-
         raw_stresslet = av_stresslet * N / (box_length**3) / kT # Translate the stresslet to the stress tensor and normalize
 
-        file4 = open("AVST"+fileout+"raw.dat","w+")
-        file4.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
-        for i in range(n_steps):
-            file4.write(str(time[i]/tb)+"   "+str(time[i]*shear_rate)+"   "+str(raw_stresslet[i][1])+"   "+str(raw_stresslet[i][0])+"   "+str(raw_stresslet[i][2])+"   "+str(0.0 - raw_stresslet[i][0] - raw_stresslet[i][2])+"\n")
-        file4.close
+        return time*kT, time*shear_rate, raw_stresslet[:,1], raw_stresslet[:,0], raw_stresslet[:,2], 0.0 - raw_stresslet[:,0] - raw_stresslet[:,2]
 
     #Prepare the stresslets for the binning
     xy_stresslet = av_stresslet[:,[1]].ravel()
@@ -180,12 +163,4 @@ def caclulate_average_stress(stresslet: Array, input_params: tuple, raw_stress_f
     binned_stresslet_yy = binned_stresslet_yy * N / (box_length**3) / kT
     binned_stresslet_zz = binned_stresslet_zz * N / (box_length**3) / kT
 
-    
-    # Save the averaged stresslet
-    file3 = open("AVST"+fileout+".dat","w+") #storing the stress tensor
-    file3.write("t/t\-(B)   \g(g)   \g(s)\-(xy)   \g(s)\-(xx)   \g(s)\-(yy)   \g(s)\-(zz)\n")
-    for i in range(len(binned_times)):
-        file3.write(str(binned_times[i]/tb)+"   "+str(binned_times[i]*shear_rate)+"   "+str(binned_stresslet_xy[i])+"   "+str(binned_stresslet_xx[i])+"   "+str(binned_stresslet_yy[i])+"   "+str(binned_stresslet_zz[i])+"\n")
-    file3.close
-
-    return binned_times*shear_rate, binned_stresslet_xy
+    return binned_times*kT, binned_times*shear_rate, binned_stresslet_xy, binned_stresslet_xx, binned_stresslet_yy, binned_stresslet_zz
